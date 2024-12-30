@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: resturant
+  # Oracle Database Configuration
+  datasource :
+    driver-class-name : oracle.jdbc.OracleDriver
+    username : hr
+    password: hr
+    url: jdbc:oracle:thin:@//localhost:1521/orclpdb
+  messages :
+    basename : i18n/messages
+    local-default :
+  # JPA and Hibernate Configuration for Oracle
+  jpa :
+    hibernate.ddl-auto : update
+    show-sql : true
+  main:
+    allow-circular-references: true
+server:
+  error:
+    include-message: always
+    include-stacktrace: never
+    include-binding-errors: always
+
+key-config:
+  key: cnjshfbuvgtryu43u8iodfhbvjygi3ruojfw
+  dur: 1h
+
