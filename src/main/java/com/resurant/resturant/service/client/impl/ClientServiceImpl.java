@@ -5,13 +5,18 @@ import com.resurant.resturant.dto.ClientDto;
 import com.resurant.resturant.dto.TokenDto;
 import com.resurant.resturant.mapper.ClientMapper;
 import com.resurant.resturant.model.Client;
+import com.resurant.resturant.model.PhotoFile;
 import com.resurant.resturant.repo.ClientRepo;
+import com.resurant.resturant.repo.PhotoRepo;
 import com.resurant.resturant.service.client.ClientService;
+import com.resurant.resturant.service.photoService.PhotoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -22,6 +27,11 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     private TokenHandler tokenHandler;
+
+    @Autowired
+    private PhotoService photoService;
+    @Autowired
+    private PhotoRepo photoRepo;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -43,7 +53,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public TokenDto signUpService(ClientDto clientDto) {
+    public TokenDto signUpService(ClientDto clientDto) throws IOException {
 
             List<ClientDto> clientDtos = getAllClients();
             for(ClientDto clientDto1:clientDtos){
@@ -53,10 +63,18 @@ public class ClientServiceImpl implements ClientService {
             }
 
             Client client = ClientMapper.mapper.clientDtoToClient(clientDto);
+
             String hashedPass = passwordEncoder.encode(client.getPassword());
 
             client.setPassword(hashedPass);
-           clientRepo.save(client);
+
+        MultipartFile multipartFile = clientDto.getPhotoFile();
+        PhotoFile photoFile =  photoService.uploadPhoto(multipartFile);
+        photoRepo.save(photoFile);
+        client.setPhotoFile(photoFile);
+        clientRepo.save(client);
+        photoFile.setClient(client);
+        photoRepo.save(photoFile);
             String token = tokenHandler.createToken(clientDto);
             return  new TokenDto(token, LocalDateTime.now(),"Created Account");
 
@@ -67,9 +85,7 @@ public class ClientServiceImpl implements ClientService {
         try{
         Client client = clientRepo.findByName(name);
         ClientDto clientDto =ClientMapper.mapper.clientToDto(client);
-        if(clientDto==null){
-            throw new RuntimeException("error.data");
-        }
+
             return clientDto;
     }catch (RuntimeException e){
             throw  new RuntimeException("error.catch");
@@ -96,5 +112,10 @@ public class ClientServiceImpl implements ClientService {
             throw new RuntimeException("error.data");
         }
         return clientDto;
+    }
+
+    @Override
+    public Client getClientById(Long id) {
+        return clientRepo.findById(id).get();
     }
 }

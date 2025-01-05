@@ -30,27 +30,30 @@ public class KeyFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String key = request.getHeader("Authorization");
-        if(!key.contains("Bearer")){
+        if(!key.startsWith("Bearer")){
             response.reset();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
         }
         String key2 =key.substring(7);
         if(!tokenHandler.verifyToken(key2)){
             response.reset();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
 
      ClientDto clientDto =  clientService.checkClientWithToken(key2);
             if(Objects.isNull(clientDto)){
                 response.reset();
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
 
 
             List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
             for(Roles role: clientDto.getRoles()){
                 SimpleGrantedAuthority simpleGrantedAuthority=
-                        new SimpleGrantedAuthority(role.toString());
+                        new SimpleGrantedAuthority(role.getRole());
                 grantedAuthorityList.add(simpleGrantedAuthority);
             }
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(clientDto,null,

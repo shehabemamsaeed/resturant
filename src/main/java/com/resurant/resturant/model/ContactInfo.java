@@ -7,17 +7,23 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Roles {
+@Setter
+@Getter
+public class ContactInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
- @ManyToOne
- @JoinColumn(name = "client_id")
- private Client client;
+    private String name;
+    private String email;
+    private String subject;
+    @Column(length = 1000)
+    private String message;
 
- private String role;
+    @ManyToOne()
+    @JoinColumn(name ="Client_id")
+    private Client client;
+
+
 }

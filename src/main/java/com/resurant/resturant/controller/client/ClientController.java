@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 import java.util.*;
 import java.net.URI;
 
@@ -17,7 +19,7 @@ public class ClientController {
 @Autowired
 private ClientService clientService;
     @PostMapping("/sign_up")
-    public ResponseEntity<TokenDto> signUp(@RequestBody ClientDto clientDto){
+    public ResponseEntity<TokenDto> signUp(@Validated @ModelAttribute  ClientDto clientDto) throws IOException {
       TokenDto tokenDto  =clientService.signUpService(clientDto);
         return ResponseEntity.created(URI.create("/client/sign_up")).body(tokenDto);
     }

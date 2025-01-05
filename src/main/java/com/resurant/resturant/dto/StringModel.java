@@ -1,7 +1,13 @@
 package com.resurant.resturant.dto;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
+@Setter
+@Getter
+@NoArgsConstructor
 public class StringModel {
     LocalDateTime localDateTime;
     String message;

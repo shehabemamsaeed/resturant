@@ -16,6 +16,7 @@ public interface ClientMapper {
     Client clientDtoToClient(ClientDto clientDto);
 
     @Mapping(source = "phoneNumber", target = "phoneNumber")
+    @Mapping(target = "photoFile", ignore = true)
     ClientDto clientToDto(Client client);
 
     @Mapping(source = "phoneNumber", target = "phoneNumber")
